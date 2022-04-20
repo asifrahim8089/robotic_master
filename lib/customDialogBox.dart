@@ -3,8 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import 'mobile.dart' if (dart.library.html) 'web.dart';
 import 'Commons/Constants.dart';
+import 'mobile.dart' if (dart.library.html) 'web.dart';
 
 class CustomDialogBox extends StatefulWidget {
   final dynamic title, descriptions, text, cartdata;
@@ -54,23 +54,13 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
     header.cells[1].value = 'Product Name';
     header.cells[2].value = 'Quantity';
 
-    PdfGridRow row = grid.rows.add();
-    row.cells[0].value = cartdata[0]["category_name"];
-    row.cells[1].value = cartdata[0]["product_name"];
-    row.cells[2].value = cartdata[0]["qty"];
-    row = grid.rows.add();
-    row.cells[0].value = cartdata[1]["category_name"];
-    row.cells[1].value = cartdata[1]["product_name"];
-    row.cells[2].value = cartdata[1]["qty"];
-    row = grid.rows.add();
-    row.cells[0].value = cartdata[2]["category_name"];
-    row.cells[1].value = cartdata[2]["product_name"];
-    row.cells[2].value = cartdata[2]["qty"];
-    row = grid.rows.add();
-    row.cells[0].value = cartdata[3]["category_name"];
-    row.cells[1].value = cartdata[3]["product_name"];
-    row.cells[2].value = cartdata[3]["qty"];
-
+    for (var item in cartdata) {
+      PdfGridRow row = grid.rows.add();
+      row.cells[0].value = item['category_name'];
+      row.cells[1].value = item['product_name'];
+      row.cells[2].value = item['qty'];
+      // row = grid.rows.add();
+    }
     grid.draw(
       page: document.pages.add(),
       // bounds: const Rect.fromLTWH(0, 0, 0, 0),

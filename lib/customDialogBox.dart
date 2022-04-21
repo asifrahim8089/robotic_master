@@ -234,10 +234,15 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                     SizedBox(
                       width: 15,
                     ),
-                    Text(
-                      "Done",
-                      style: TextStyle(
-                          color: Colors.deepPurpleAccent, fontSize: 20),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        "Done",
+                        style: TextStyle(
+                            color: Colors.deepPurpleAccent, fontSize: 20),
+                      ),
                     )
                   ],
                 )

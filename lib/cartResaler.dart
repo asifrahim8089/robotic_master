@@ -71,9 +71,10 @@ class _CartResalerState extends State<CartResaler> {
 
     if (response.statusCode == 200) {
       Map<String, dynamic> output = json.decode(responsed.body);
-      print(output);
+
+      // print(output);
       setState(() {
-        delete = cartdata;
+        fetchCart();
       });
     } else {
       showSnackBar(

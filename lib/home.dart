@@ -115,7 +115,7 @@ class _HomeState extends State<Home> {
         });
 
         if (cartitem == null) {
-          print("cartitem is null");
+          delete_cart_item(product_id);
         }
       } else {
         showSnackBar(
@@ -128,7 +128,6 @@ class _HomeState extends State<Home> {
   }
 
   void delete_cart_item(String product_id) async {
-    print("deleted product");
     Map<String, String> data = {
       "cart_item_id": product_id,
     };
@@ -147,8 +146,10 @@ class _HomeState extends State<Home> {
 
     if (response.statusCode == 200) {
       Map<String, dynamic> output = json.decode(responsed.body);
+      print(output);
       setState(() {
         delete = output["data"];
+        print(delete);
       });
     } else {
       showSnackBar(

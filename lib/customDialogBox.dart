@@ -30,10 +30,10 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
 
   void convertPdf({cartdata}) async {
     PdfDocument document = PdfDocument();
-    final page = document.pages.add();
+    // final page = document.pages.add();
 
-    page.graphics.drawString(
-        'Your Order Details', PdfStandardFont(PdfFontFamily.helvetica, 30));
+    // page.graphics.drawString(
+    //     'Your Order Details', PdfStandardFont(PdfFontFamily.helvetica, 30));
 
     PdfGrid grid = PdfGrid();
     grid.style = PdfGridStyle(
@@ -63,7 +63,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
     }
     grid.draw(
       page: document.pages.add(),
-      // bounds: const Rect.fromLTWH(0, 0, 0, 0),
+      bounds: const Rect.fromLTWH(0, 0, 0, 0),
     );
 
     List<int> bytes = document.save();

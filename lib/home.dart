@@ -31,6 +31,7 @@ class _HomeState extends State<Home> {
 
   final itemScrollController = ItemScrollController();
   var data;
+  var cartdata;
   var cartitem;
   var slider;
   var user;
@@ -212,6 +213,7 @@ class _HomeState extends State<Home> {
     fetch_dealer(context);
     getData(context);
     getslider(context);
+    fetchCart();
     super.initState();
   }
 
@@ -718,9 +720,9 @@ class _HomeState extends State<Home> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   // ignore: prefer_const_literals_to_create_immutables
                   children: [
-                    cartitem != null
+                    cartdata != null
                         ? Text(
-                            "${cartitem.length.toString()}\tItems",
+                            "${cartdata.length.toString()}\tItems",
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
@@ -919,6 +921,41 @@ class _HomeState extends State<Home> {
             ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  void fetchCart() async {
+    SharedPreferences dealer = await SharedPreferences.getInstance();
+    var status = dealer.getBool('isDealer') ?? false;
+    Map<String, String> data = {
+      "user_type": status ? "DEALER" : "RESELLER",
+      "user_id": widget.dealerdetails,
+    };
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://robotek.frantic.in/RestApi/fetch_cart'));
+    request.headers.addAll({
+      "Content-Type": "multipart/form-data",
+      "Accept": "multipart/form-data",
+    });
+    request.fields['user_type'] = status ? "DEALER" : "RESELLER";
+    request.fields['user_id'] = widget.dealerdetails;
+    var response = await request.send();
+    var responsed = await http.Response.fromStream(response);
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> output = json.decode(responsed.body);
+      setState(() {
+        cartdata = output["data"];
+        cartdata == null
+            ? print("0")
+            : print("cart length is :${cartdata.length}");
+      });
+    } else {
+      showSnackBar(
+        duration: Duration(milliseconds: 10000),
+        context: context,
+        message: "Error",
+      );
+    }
   }
 
   Future<void> selectUser() async {

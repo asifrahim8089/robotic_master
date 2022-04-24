@@ -201,20 +201,20 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                         Text("PDF"),
                       ],
                     ),
-                    // Row(
-                    //   children: [
-                    //     Checkbox(
-                    //       value: value2,
-                    //       onChanged: (val) {
-                    //         setState(() {
-                    //           value2 = val!;
-                    //         });
-                    //         value2 == true ? convertImage() : null;
-                    //       },
-                    //     ),
-                    //     Text("Image"),
-                    //   ],
-                    // ),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: value2,
+                          onChanged: (val) {
+                            setState(() {
+                              value2 = val!;
+                            });
+                            value2 == true ? convertImage() : null;
+                          },
+                        ),
+                        Text("Image"),
+                      ],
+                    ),
                   ],
                 ),
                 SizedBox(

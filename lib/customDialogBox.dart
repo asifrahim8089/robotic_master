@@ -1,19 +1,21 @@
 // ignore_for_file: use_key_in_widget_constructors, avoid_print, prefer_const_constructors, unused_local_variable
 
 import 'package:flutter/material.dart';
+import 'package:robotek/home.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 import 'Commons/Constants.dart';
 import 'mobile.dart' if (dart.library.html) 'web.dart';
 
 class CustomDialogBox extends StatefulWidget {
-  final dynamic title, descriptions, text, cartdata;
+  final dynamic title, descriptions, text, cartdata, userid;
 
   const CustomDialogBox(
       {required this.title,
       required this.descriptions,
       required this.text,
-      required this.cartdata});
+      required this.cartdata,
+      required this.userid});
 
   @override
   _CustomDialogBoxState createState() => _CustomDialogBoxState();
@@ -199,20 +201,20 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                         Text("PDF"),
                       ],
                     ),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: value2,
-                          onChanged: (val) {
-                            setState(() {
-                              value2 = val!;
-                            });
-                            value2 == true ? convertImage() : null;
-                          },
-                        ),
-                        Text("Image"),
-                      ],
-                    ),
+                    // Row(
+                    //   children: [
+                    //     Checkbox(
+                    //       value: value2,
+                    //       onChanged: (val) {
+                    //         setState(() {
+                    //           value2 = val!;
+                    //         });
+                    //         value2 == true ? convertImage() : null;
+                    //       },
+                    //     ),
+                    //     Text("Image"),
+                    //   ],
+                    // ),
                   ],
                 ),
                 SizedBox(
@@ -236,7 +238,14 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                Home(dealerdetails: widget.userid),
+                          ),
+                          (route) => false,
+                        );
                       },
                       child: Text(
                         "Done",

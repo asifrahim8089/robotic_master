@@ -3,9 +3,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:robotek/Commons/SnackBar.dart';
 import 'package:robotek/Commons/colorResource.dart';
 import 'package:robotek/Commons/zerostate.dart';
+import 'package:robotek/Providers/get_data_provider.dart';
 
 import 'customDialogBox.dart';
 
@@ -19,81 +21,82 @@ class CartResaler extends StatefulWidget {
 }
 
 class _CartResalerState extends State<CartResaler> {
-  var cartdata;
-  var delete;
-  void fetchCart() async {
-    Map<String, String> data = {
-      "user_type": widget.usertype,
-      "user_id": widget.dealerid,
-    };
-    var request = http.MultipartRequest(
-        'POST', Uri.parse('https://robotek.frantic.in/RestApi/fetch_cart'));
-    request.headers.addAll({
-      "Content-Type": "multipart/form-data",
-      "Accept": "multipart/form-data",
-    });
-    request.fields['user_type'] = widget.usertype;
-    request.fields['user_id'] = widget.dealerid;
-    var response = await request.send();
-    var responsed = await http.Response.fromStream(response);
+  // var cartdata;
+  // var delete;
+  // void fetchCart() async {
+  //   Map<String, String> data = {
+  //     "user_type": widget.usertype,
+  //     "user_id": widget.dealerid,
+  //   };
+  //   var request = http.MultipartRequest(
+  //       'POST', Uri.parse('https://robotek.frantic.in/RestApi/fetch_cart'));
+  //   request.headers.addAll({
+  //     "Content-Type": "multipart/form-data",
+  //     "Accept": "multipart/form-data",
+  //   });
+  //   request.fields['user_type'] = widget.usertype;
+  //   request.fields['user_id'] = widget.dealerid;
+  //   var response = await request.send();
+  //   var responsed = await http.Response.fromStream(response);
 
-    if (response.statusCode == 200) {
-      Map<String, dynamic> output = json.decode(responsed.body);
-      setState(() {
-        cartdata = output["data"];
-        print(cartdata);
-      });
-    } else {
-      showSnackBar(
-        duration: Duration(milliseconds: 10000),
-        context: context,
-        message: "Error",
-      );
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     Map<String, dynamic> output = json.decode(responsed.body);
+  //     setState(() {
+  //       cartdata = output["data"];
+  //       print(cartdata);
+  //     });
+  //   } else {
+  //     showSnackBar(
+  //       duration: Duration(milliseconds: 10000),
+  //       context: context,
+  //       message: "Error",
+  //     );
+  //   }
+  // }
 
-  void delete_cart_item(String productId) async {
-    Map<String, String> data = {
-      "cart_item_id": productId,
-    };
+  // void delete_cart_item(String productId) async {
+  //   Map<String, String> data = {
+  //     "cart_item_id": productId,
+  //   };
 
-    var request = http.MultipartRequest('POST',
-        Uri.parse('http://robotek.frantic.in/RestApi/delete_cart_item'));
-    request.headers.addAll({
-      "Content-Type": "multipart/form-data",
-      "Accept": "multipart/form-data",
-    });
-    request.fields['cart_item_id'] = productId;
+  //   var request = http.MultipartRequest('POST',
+  //       Uri.parse('http://robotek.frantic.in/RestApi/delete_cart_item'));
+  //   request.headers.addAll({
+  //     "Content-Type": "multipart/form-data",
+  //     "Accept": "multipart/form-data",
+  //   });
+  //   request.fields['cart_item_id'] = productId;
 
-    var response = await request.send();
-    var responsed = await http.Response.fromStream(response);
-    final responseData = json.decode(responsed.body);
+  //   var response = await request.send();
+  //   var responsed = await http.Response.fromStream(response);
+  //   final responseData = json.decode(responsed.body);
 
-    if (response.statusCode == 200) {
-      Map<String, dynamic> output = json.decode(responsed.body);
+  //   if (response.statusCode == 200) {
+  //     Map<String, dynamic> output = json.decode(responsed.body);
 
-      // print(output);
-      setState(() {
-        fetchCart();
-      });
-    } else {
-      showSnackBar(
-        duration: Duration(milliseconds: 1000),
-        context: context,
-        message: "Could not delete",
-      );
-    }
-  }
+  //     // print(output);
+  //     setState(() {
+  //       fetchCart();
+  //     });
+  //   } else {
+  //     showSnackBar(
+  //       duration: Duration(milliseconds: 1000),
+  //       context: context,
+  //       message: "Could not delete",
+  //     );
+  //   }
+  // }
 
   @override
   void initState() {
-    fetchCart();
-
+    Provider.of<GetDataProvider>(context, listen: false)
+        .fetchCart(context, widget.dealerid);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final getcart = Provider.of<GetDataProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -122,7 +125,7 @@ class _CartResalerState extends State<CartResaler> {
       body: SingleChildScrollView(
         child: SizedBox(
           width: MediaQuery.of(context).size.width,
-          child: cartdata == null
+          child: getcart.cartdata == null
               ? zerostate(
                   size: 180,
                   height: 800,
@@ -136,7 +139,7 @@ class _CartResalerState extends State<CartResaler> {
                     ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: cartdata.length,
+                      itemCount: getcart.cartdata.length,
                       itemBuilder: (BuildContext context, int index) {
                         return InkWell(
                           onTap: () {},
@@ -151,7 +154,7 @@ class _CartResalerState extends State<CartResaler> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 10),
                                     child: Text(
-                                      cartdata[index]["category_name"]
+                                      getcart.cartdata[index]["category_name"]
                                           .toString(),
                                       style: TextStyle(
                                           fontSize: 17,
@@ -164,8 +167,12 @@ class _CartResalerState extends State<CartResaler> {
                                         horizontal: 10),
                                     child: IconButton(
                                         onPressed: () {
-                                          delete_cart_item(
-                                              cartdata[index]["id"]);
+                                          setState(() {
+                                            getcart.delete_cart_item(
+                                                getcart.cartdata[index]["id"],
+                                                widget.dealerid,
+                                                context);
+                                          });
                                         },
                                         icon: Icon(
                                           Icons.delete_forever,
@@ -204,7 +211,7 @@ class _CartResalerState extends State<CartResaler> {
                                             children: [
                                               Expanded(
                                                 child: Text(
-                                                  cartdata[index]
+                                                  getcart.cartdata[index]
                                                           ["product_name"]
                                                       .toString(),
                                                   style: TextStyle(
@@ -226,7 +233,8 @@ class _CartResalerState extends State<CartResaler> {
                                           width: 40,
                                           child: Center(
                                               child: Text(
-                                            cartdata[index]["qty"].toString(),
+                                            getcart.cartdata[index]["qty"]
+                                                .toString(),
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 20),
@@ -252,7 +260,7 @@ class _CartResalerState extends State<CartResaler> {
                 ),
         ),
       ),
-      floatingActionButton: cartdata == null
+      floatingActionButton: getcart.cartdata == null
           ? null
           : SizedBox(
               width: 350,
@@ -271,7 +279,8 @@ class _CartResalerState extends State<CartResaler> {
                                 "1. Rewards will be given after 1 day of competition ends."
                                 "\n\n\n\n\n",
                             text: "Yes",
-                            cartdata: cartdata,
+                            cartdata: getcart.cartdata,
+                            userid: null,
                           );
                         },
                       );

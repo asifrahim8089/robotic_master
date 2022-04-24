@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print, non_constant_identifier_names, prefer_typing_uninitialized_variables, prefer_const_constructors
 
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:robotek/Commons/SnackBar.dart';
@@ -64,7 +65,8 @@ class GetDataProvider extends ChangeNotifier {
   }
 
 //* DELETE FROM CART
-  Future delete_cart_item(String product_id, dealerid, context) async {
+  Future delete_cart_item(
+      String product_id, dealerid, int index, context) async {
     Map<String, String> data = {
       "cart_item_id": product_id,
     };
@@ -92,6 +94,7 @@ class GetDataProvider extends ChangeNotifier {
         message: "Could not delete",
       );
     }
+    cartdata.removeAt(index);
     notifyListeners();
   }
 

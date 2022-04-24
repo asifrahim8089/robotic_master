@@ -1,10 +1,7 @@
 // ignore_for_file: avoid_print, prefer_const_constructors, prefer_typing_uninitialized_variables
 
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:robotek/Commons/SnackBar.dart';
 import 'package:robotek/Commons/colorResource.dart';
 import 'package:robotek/Commons/zerostate.dart';
 import 'package:robotek/Providers/get_data_provider.dart';
@@ -21,72 +18,6 @@ class CartResaler extends StatefulWidget {
 }
 
 class _CartResalerState extends State<CartResaler> {
-  // var cartdata;
-  // var delete;
-  // void fetchCart() async {
-  //   Map<String, String> data = {
-  //     "user_type": widget.usertype,
-  //     "user_id": widget.dealerid,
-  //   };
-  //   var request = http.MultipartRequest(
-  //       'POST', Uri.parse('https://robotek.frantic.in/RestApi/fetch_cart'));
-  //   request.headers.addAll({
-  //     "Content-Type": "multipart/form-data",
-  //     "Accept": "multipart/form-data",
-  //   });
-  //   request.fields['user_type'] = widget.usertype;
-  //   request.fields['user_id'] = widget.dealerid;
-  //   var response = await request.send();
-  //   var responsed = await http.Response.fromStream(response);
-
-  //   if (response.statusCode == 200) {
-  //     Map<String, dynamic> output = json.decode(responsed.body);
-  //     setState(() {
-  //       cartdata = output["data"];
-  //       print(cartdata);
-  //     });
-  //   } else {
-  //     showSnackBar(
-  //       duration: Duration(milliseconds: 10000),
-  //       context: context,
-  //       message: "Error",
-  //     );
-  //   }
-  // }
-
-  // void delete_cart_item(String productId) async {
-  //   Map<String, String> data = {
-  //     "cart_item_id": productId,
-  //   };
-
-  //   var request = http.MultipartRequest('POST',
-  //       Uri.parse('http://robotek.frantic.in/RestApi/delete_cart_item'));
-  //   request.headers.addAll({
-  //     "Content-Type": "multipart/form-data",
-  //     "Accept": "multipart/form-data",
-  //   });
-  //   request.fields['cart_item_id'] = productId;
-
-  //   var response = await request.send();
-  //   var responsed = await http.Response.fromStream(response);
-  //   final responseData = json.decode(responsed.body);
-
-  //   if (response.statusCode == 200) {
-  //     Map<String, dynamic> output = json.decode(responsed.body);
-
-  //     // print(output);
-  //     setState(() {
-  //       fetchCart();
-  //     });
-  //   } else {
-  //     showSnackBar(
-  //       duration: Duration(milliseconds: 1000),
-  //       context: context,
-  //       message: "Could not delete",
-  //     );
-  //   }
-  // }
-
   @override
   void initState() {
     Provider.of<GetDataProvider>(context, listen: false)
@@ -96,7 +27,7 @@ class _CartResalerState extends State<CartResaler> {
 
   @override
   Widget build(BuildContext context) {
-    final getcart = Provider.of<GetDataProvider>(context, listen: false);
+    final getcart = Provider.of<GetDataProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -152,7 +83,8 @@ class _CartResalerState extends State<CartResaler> {
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
+                                      horizontal: 10,
+                                    ),
                                     child: Text(
                                       getcart.cartdata[index]["category_name"]
                                           .toString(),
@@ -166,13 +98,12 @@ class _CartResalerState extends State<CartResaler> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 10),
                                     child: IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            getcart.delete_cart_item(
-                                                getcart.cartdata[index]["id"],
-                                                widget.dealerid,
-                                                context);
-                                          });
+                                        onPressed: () async {
+                                          await getcart.delete_cart_item(
+                                              getcart.cartdata[index]["id"],
+                                              widget.dealerid,
+                                              index,
+                                              context);
                                         },
                                         icon: Icon(
                                           Icons.delete_forever,

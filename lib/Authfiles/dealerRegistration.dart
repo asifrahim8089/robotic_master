@@ -106,7 +106,7 @@ class _DealerRegistrationState extends State<DealerRegistration> {
         child: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          leading: InkWell(
+          leading: GestureDetector(
             onTap: () {
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (Context) => DealerLogin()));
@@ -320,7 +320,7 @@ class _DealerRegistrationState extends State<DealerRegistration> {
                 Padding(
                   padding: EdgeInsets.only(top: 60),
                 ),
-                InkWell(
+                GestureDetector(
                   child: Container(
                     height: 50,
                     width: 300,

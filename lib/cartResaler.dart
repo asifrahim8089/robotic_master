@@ -72,7 +72,7 @@ class _CartResalerState extends State<CartResaler> {
                       shrinkWrap: true,
                       itemCount: getcart.cartdata.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return InkWell(
+                        return GestureDetector(
                           onTap: () {},
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,7 +199,7 @@ class _CartResalerState extends State<CartResaler> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  InkWell(
+                  GestureDetector(
                     onTap: () {
                       showDialog(
                         context: context,

@@ -12,7 +12,11 @@ import 'package:robotek/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpUser extends StatefulWidget {
-  const SignUpUser({Key? key}) : super(key: key);
+  final String phoneNumber;
+  const SignUpUser({
+    Key? key,
+    required this.phoneNumber,
+  }) : super(key: key);
 
   @override
   _SignUpUserState createState() => _SignUpUserState();
@@ -33,7 +37,7 @@ class _SignUpUserState extends State<SignUpUser> {
         circular = true;
       });
       Map<String, String> data = {
-        "phone": _phoneController.text,
+        "phone": widget.phoneNumber,
         "email": _emailController.text,
         "name": _nameController.text,
         "gender": selectedValue.toString(),
@@ -46,7 +50,7 @@ class _SignUpUserState extends State<SignUpUser> {
         "Content-Type": "multipart/form-data",
         "Accept": "multipart/form-data",
       });
-      request.fields['phone'] = _phoneController.text;
+      request.fields['phone'] = widget.phoneNumber;
       request.fields['email'] = _emailController.text;
       request.fields['name'] = _nameController.text;
       request.fields['gender'] = selectedValue.toString();
@@ -94,7 +98,7 @@ class _SignUpUserState extends State<SignUpUser> {
           backgroundColor: Colors.transparent,
           elevation: 0,
 
-          leading: InkWell(
+          leading: GestureDetector(
             onTap: () {
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (Context) => EnterYourNumber()));
@@ -135,7 +139,7 @@ class _SignUpUserState extends State<SignUpUser> {
           //
           //
           //
-          //     InkWell(
+          //     GestureDetector(
           //         onTap: (){
           //           Navigator.pushReplacement(context, MaterialPageRoute(builder: (Context)=>Home()));
           //         },
@@ -234,11 +238,11 @@ class _SignUpUserState extends State<SignUpUser> {
                       children: [
                         Expanded(
                           child: TextFormField(
-                            validator: nameValidator,
+                            readOnly: true,
                             controller: _phoneController,
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: "Phone",
+                              hintText: widget.phoneNumber,
                             ),
                             // onChanged: (value) {
                             //   var number = value.toString();
@@ -293,7 +297,7 @@ class _SignUpUserState extends State<SignUpUser> {
                 Padding(
                   padding: EdgeInsets.only(top: 60),
                 ),
-                InkWell(
+                GestureDetector(
                   child: Container(
                     height: 50,
                     width: 300,

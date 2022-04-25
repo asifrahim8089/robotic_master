@@ -4,9 +4,11 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:robotek/Commons/SnackBar.dart';
 import 'package:robotek/Commons/colorResource.dart';
 import 'package:robotek/Commons/zerostate.dart';
+import 'package:robotek/Providers/get_data_provider.dart';
 import 'package:robotek/order_placed.dart';
 
 class DealerCart extends StatefulWidget {
@@ -19,37 +21,36 @@ class DealerCart extends StatefulWidget {
 }
 
 class _DealerCartState extends State<DealerCart> {
-  var cartdata;
-  void fetchCart() async {
-    Map<String, String> data = {
-      "user_type": widget.usertype,
-      "user_id": widget.dealerid,
-    };
-    var request = http.MultipartRequest(
-        'POST', Uri.parse('https://robotek.frantic.in/RestApi/fetch_cart'));
-    request.headers.addAll({
-      "Content-Type": "multipart/form-data",
-      "Accept": "multipart/form-data",
-    });
-    request.fields['user_type'] = widget.usertype;
-    request.fields['user_id'] = widget.dealerid;
-    var response = await request.send();
-    var responsed = await http.Response.fromStream(response);
+  // void fetchCart() async {
+  //   Map<String, String> data = {
+  //     "user_type": widget.usertype,
+  //     "user_id": widget.dealerid,
+  //   };
+  //   var request = http.MultipartRequest(
+  //       'POST', Uri.parse('https://robotek.frantic.in/RestApi/fetch_cart'));
+  //   request.headers.addAll({
+  //     "Content-Type": "multipart/form-data",
+  //     "Accept": "multipart/form-data",
+  //   });
+  //   request.fields['user_type'] = widget.usertype;
+  //   request.fields['user_id'] = widget.dealerid;
+  //   var response = await request.send();
+  //   var responsed = await http.Response.fromStream(response);
 
-    if (response.statusCode == 200) {
-      Map<String, dynamic> output = json.decode(responsed.body);
-      setState(() {
-        cartdata = output["data"];
-      });
-      print(cartdata);
-    } else {
-      showSnackBar(
-        duration: Duration(milliseconds: 10000),
-        context: context,
-        message: "Error",
-      );
-    }
-  }
+  //   if (response.statusCode == 200) {
+  //     Map<String, dynamic> output = json.decode(responsed.body);
+  //     setState(() {
+  //       cartdata = output["data"];
+  //     });
+  //     print(cartdata);
+  //   } else {
+  //     showSnackBar(
+  //       duration: Duration(milliseconds: 10000),
+  //       context: context,
+  //       message: "Error",
+  //     );
+  //   }
+  // }
 
   void placeOrder() async {
     Map<String, String> data = {
@@ -94,12 +95,14 @@ class _DealerCartState extends State<DealerCart> {
 
   @override
   void initState() {
-    fetchCart();
+    Provider.of<GetDataProvider>(context, listen: false)
+        .fetchCart(context, widget.dealerid);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final getcart = Provider.of<GetDataProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -128,7 +131,7 @@ class _DealerCartState extends State<DealerCart> {
       body: SingleChildScrollView(
         child: SizedBox(
           width: MediaQuery.of(context).size.width,
-          child: cartdata == null
+          child: getcart.cartdata == null
               ? zerostate(
                   size: 180,
                   height: 800,
@@ -147,20 +150,43 @@ class _DealerCartState extends State<DealerCart> {
                         child: ListView.builder(
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: cartdata.length,
+                          itemCount: getcart.cartdata.length,
                           itemBuilder: (BuildContext context, int index) {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Text(
-                                    cartdata[index]["category_name"].toString(),
-                                    style: TextStyle(
-                                        fontSize: 17,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
-                                  ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Text(
+                                        getcart.cartdata[index]["category_name"]
+                                            .toString(),
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: IconButton(
+                                          onPressed: () async {
+                                            await getcart.delete_cart_item(
+                                                getcart.cartdata[index]["id"],
+                                                widget.dealerid,
+                                                index,
+                                                context);
+                                          },
+                                          icon: Icon(
+                                            Icons.delete_forever,
+                                            color: Colors.black,
+                                          )),
+                                    )
+                                  ],
                                 ),
                                 Container(
                                   margin: EdgeInsets.only(
@@ -201,7 +227,8 @@ class _DealerCartState extends State<DealerCart> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                cartdata[index]["product_name"]
+                                                getcart.cartdata[index]
+                                                        ["product_name"]
                                                     .toString(),
                                                 style: TextStyle(
                                                     fontSize: 17,
@@ -214,7 +241,7 @@ class _DealerCartState extends State<DealerCart> {
                                                     EdgeInsets.only(top: 5),
                                               ),
                                               Text(
-                                                cartdata[index]
+                                                getcart.cartdata[index]
                                                         ["product_details"]
                                                     .toString(),
                                                 style: TextStyle(
@@ -228,7 +255,8 @@ class _DealerCartState extends State<DealerCart> {
                                       Row(
                                         children: [
                                           Text(
-                                            cartdata[index]["qty"].toString(),
+                                            getcart.cartdata[index]["qty"]
+                                                .toString(),
                                             style: TextStyle(
                                                 fontWeight: FontWeight.normal,
                                                 fontSize: 18),
@@ -252,7 +280,6 @@ class _DealerCartState extends State<DealerCart> {
                       padding: const EdgeInsets.all(12.0),
                       child: GestureDetector(
                         onTap: () {
-                          // print("order placed");
                           placeOrder();
                         },
                         child: Container(

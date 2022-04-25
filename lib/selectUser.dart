@@ -44,7 +44,7 @@ class _SelectUserState extends State<SelectUser> {
               Padding(
                 padding: EdgeInsets.only(top: 30),
               ),
-              InkWell(
+              GestureDetector(
                 onTap: () {
                   Navigator.push(
                       context,
@@ -90,7 +90,7 @@ class _SelectUserState extends State<SelectUser> {
               Padding(
                 padding: EdgeInsets.only(top: 30),
               ),
-              InkWell(
+              GestureDetector(
                 onTap: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (Context) => DealerLogin()));

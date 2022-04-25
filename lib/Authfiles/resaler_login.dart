@@ -183,7 +183,7 @@ class _EnterYourNumberState extends State<EnterYourNumber> {
                         )
                       ],
                     )),
-                InkWell(
+                GestureDetector(
                   child: Container(
                     height: 50,
                     width: 300,

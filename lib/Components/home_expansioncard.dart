@@ -74,7 +74,7 @@ Widget expansionInnercard(
                           fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      "PCS",
+                      "${products[indexproducts]["details"]} PCS",
                       style: TextStyle(fontSize: 13, color: Colors.black54),
                     ),
                   ],

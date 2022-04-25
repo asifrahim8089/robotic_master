@@ -182,7 +182,7 @@ class _DealerLoginState extends State<DealerLogin> {
                 Padding(
                   padding: EdgeInsets.only(top: 60),
                 ),
-                InkWell(
+                GestureDetector(
                   child: Container(
                     height: 50,
                     width: 300,
@@ -216,7 +216,7 @@ class _DealerLoginState extends State<DealerLogin> {
                             fontSize: 20),
                       ),
                     ),
-                    InkWell(
+                    GestureDetector(
                       onTap: () {
                         Navigator.push(
                             context,

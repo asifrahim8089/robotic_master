@@ -138,7 +138,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                 ),
                 Align(
                     alignment: Alignment.bottomCenter,
-                    child: InkWell(
+                    child: GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
                       },
@@ -201,20 +201,20 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                         Text("PDF"),
                       ],
                     ),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: value2,
-                          onChanged: (val) {
-                            setState(() {
-                              value2 = val!;
-                            });
-                            value2 == true ? convertImage() : null;
-                          },
-                        ),
-                        Text("Image"),
-                      ],
-                    ),
+                    // Row(
+                    //   children: [
+                    //     Checkbox(
+                    //       value: value2,
+                    //       onChanged: (val) {
+                    //         setState(() {
+                    //           value2 = val!;
+                    //         });
+                    //         value2 == true ? convertImage() : null;
+                    //       },
+                    //     ),
+                    //     Text("Image"),
+                    //   ],
+                    // ),
                   ],
                 ),
                 SizedBox(
@@ -223,7 +223,7 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    InkWell(
+                    GestureDetector(
                       child: Text(
                         "Cancel",
                         style: TextStyle(

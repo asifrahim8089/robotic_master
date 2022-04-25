@@ -41,8 +41,6 @@ class _otpVerificationState extends State<otpVerification> {
   }
 
   void _verifyUser(typedotp) async {
-    print("111111");
-
     Map<String, String> data = {
       "phone": widget.phoneNumber,
       "otp": typedotp.toString(),
@@ -92,7 +90,9 @@ class _otpVerificationState extends State<otpVerification> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (context) => SignUpUser(),
+            builder: (context) => SignUpUser(
+              phoneNumber: widget.phoneNumber,
+            ),
           ),
           (route) => false,
         );
@@ -217,7 +217,7 @@ class _otpVerificationState extends State<otpVerification> {
                   },
                 ),
               ),
-              InkWell(
+              GestureDetector(
                 child: Container(
                   height: 50,
                   width: 300,

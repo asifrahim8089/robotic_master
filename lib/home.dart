@@ -1,6 +1,7 @@
-// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, unused_local_variable, avoid_print, deprecated_member_use, unnecessary_new, prefer_collection_literals, non_constant_identifier_names, unrelated_type_equality_checks, unnecessary_null_comparison, prefer_typing_uninitialized_variables, unused_field
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, unused_local_variable, avoid_print, deprecated_member_use, unnecessary_new, prefer_collection_literals, non_constant_identifier_names, unrelated_type_equality_checks, unnecessary_null_comparison, prefer_typing_uninitialized_variables, unused_field, unused_element
 
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ import 'package:robotek/dealerCart.dart';
 import 'package:robotek/myOrdersDealer.dart';
 import 'package:robotek/selectUser.dart';
 import 'package:robotek/terms&Conditions.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,7 +34,9 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   double height = 40;
   double width = 160;
-  final itemScrollController = ItemScrollController();
+  // ignore: prefer_final_fields
+  ItemScrollController _scrollController = ItemScrollController();
+
   var data;
   var slider;
   Color colorContainer = colorResource.primaryColor2;
@@ -80,14 +84,15 @@ class _HomeState extends State<Home> {
   }
 
   Future scrollToItem(val) async {
-    print(val);
-    itemScrollController.scrollTo(
-      curve: Curves.easeInOut,
+    _scrollController.scrollTo(
+      curve: Curves.slowMiddle,
+      alignment: 0.5,
       index: val + 1,
       duration: Duration(
-        milliseconds: 400,
+        milliseconds: 1000,
       ),
     );
+    print(val + 1);
   }
 
   @override
@@ -103,6 +108,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final getuser = Provider.of<GetDataProvider>(context);
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: Colors.white,
@@ -153,79 +159,88 @@ class _HomeState extends State<Home> {
                         itemBuilder: (context, int index) {
                           return slider == null
                               ? bannerShimmer()
-                              : Container(
-                                  margin: EdgeInsets.only(right: 10),
-                                  width: 280,
-                                  clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black26,
-                                    borderRadius: BorderRadius.circular(5),
-                                    // ignore: prefer_const_literals_to_create_immutables
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: Color(0x48EEEEEE),
-                                          spreadRadius: 4,
-                                          blurRadius: 20)
-                                    ],
-                                    image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: NetworkImage(
-                                          "https://robotek.frantic.in/uploads/" +
-                                              slider[index]["image"]),
+                              : Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: Container(
+                                    margin: EdgeInsets.only(right: 10),
+                                    width: 280,
+                                    clipBehavior: Clip.antiAlias,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black26,
+                                      borderRadius: BorderRadius.circular(5),
+                                      // ignore: prefer_const_literals_to_create_immutables
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: Color(0x48EEEEEE),
+                                            spreadRadius: 4,
+                                            blurRadius: 20)
+                                      ],
+                                      image: DecorationImage(
+                                        fit: BoxFit.cover,
+                                        image: NetworkImage(
+                                            "https://robotek.frantic.in/uploads/" +
+                                                slider[index]["image"]),
+                                      ),
                                     ),
                                   ),
                                 );
                         }),
                   ),
                   Padding(padding: EdgeInsets.only(top: 25)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    // ignore: prefer_const_literals_to_create_immutables
-                    children: [
-                      Text(
-                        "CATEGORIES",
-                        style: TextStyle(
-                            color: colorResource.primaryColorLight,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14),
-                      ),
-                      Flexible(
-                        child: Text(
-                          "DOWLOAD CATALOGUE",
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // ignore: prefer_const_literals_to_create_immutables
+                      children: [
+                        Text(
+                          "CATEGORIES",
                           style: TextStyle(
-                              color: colorResource.primaryColor2,
+                              color: colorResource.primaryColorLight,
                               fontWeight: FontWeight.bold,
-                              fontSize: 13),
+                              fontSize: 14),
                         ),
-                      )
-                    ],
+                        Flexible(
+                          child: Text(
+                            "DOWLOAD CATALOGUE",
+                            style: TextStyle(
+                                color: colorResource.primaryColor2,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                   ScrollablePositionedList.builder(
                     shrinkWrap: true,
                     physics: ScrollPhysics(),
-                    itemScrollController: itemScrollController,
+                    itemScrollController: _scrollController,
                     itemCount: data.length,
                     scrollDirection: Axis.vertical,
-                    itemBuilder: (BuildContext context, int index1) {
+                    itemBuilder: (BuildContext context, int index) {
                       return expansionInnercard(
-                        category: data[index1]["category"],
-                        products: data[index1]["products"],
+                        category: data[index]["category"],
+                        products: data[index]["products"],
                         userid: widget.dealerdetails,
                         context: context,
                       );
                     },
                   ),
+                  SizedBox(
+                    height: 100,
+                  )
                 ],
               ),
             ),
-      floatingActionButton: Container(
-        width: MediaQuery.of(context).size.width,
-        // height: 40,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            InkWell(
+            GestureDetector(
               onTap: () async {
                 setState(() {
                   width = 160;
@@ -304,7 +319,7 @@ class _HomeState extends State<Home> {
 
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: InkWell(
+                              child: GestureDetector(
                                 onTap: () {
                                   setState(() {
                                     categoryVis = true;
@@ -344,12 +359,12 @@ class _HomeState extends State<Home> {
             ),
             Consumer<GetDataProvider>(
               builder: (context, data, child) {
-                return InkWell(
+                return GestureDetector(
                   onTap: () {
                     selectUser();
                   },
                   child: Container(
-                    width: 370,
+                    width: MediaQuery.of(context).size.width,
                     height: 50,
                     decoration: BoxDecoration(
                       color: Colors.black,
@@ -390,6 +405,176 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
+      drawer: getuser.user == null
+          ? loadingShimmer()
+          : Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  Container(
+                      margin: EdgeInsets.fromLTRB(20, 40, 00, 40),
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            'assets/businessMale.png',
+                            height: 50,
+                          ),
+                          Padding(padding: EdgeInsets.only(left: 20)),
+                          Expanded(
+                            child: Text(
+                              "Hi, ${getuser.user["name"]}".toUpperCase(),
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        ],
+                      )),
+                  ListTile(
+                    title: const Text(
+                      'My Orders',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    leading: IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.shopping_cart),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (Context) => MyOrdersDealer()));
+                    },
+                  ),
+                  ListTile(
+                    title: const Text(
+                      'About Us',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    leading: IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (Context) => TermsCondition()));
+                      },
+                      icon: Image.asset('assets/team.png'),
+                    ),
+                    onTap: () {
+                      // Update the state of the app.
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (Context) => TermsCondition()));
+                    },
+                  ),
+                  ListTile(
+                    title: const Text(
+                      'Contact Us',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    leading: IconButton(
+                      onPressed: () {},
+                      icon: Image.asset('assets/support.png'),
+                    ),
+                    onTap: () {
+                      // Update the state of the app.
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (Context) => CustomerSupport()));
+                    },
+                  ),
+                  ListTile(
+                    title: const Text(
+                      'Terms & Conditions',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    leading: IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (Context) => TermsCondition()));
+                      },
+                      icon: Image.asset('assets/terms-and-conditions.png'),
+                    ),
+                    onTap: () {
+                      // Update the state of the app.
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (Context) => TermsCondition()));
+                    },
+                  ),
+                  ListTile(
+                    title: const Text(
+                      'Privacy Policy',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    leading: IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (Context) => TermsCondition()));
+                      },
+                      icon: Image.asset('assets/privacy-policy (1).png'),
+                    ),
+                    onTap: () {
+                      // Update the state of the app.
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (Context) => TermsCondition()));
+                    },
+                  ),
+                  ListTile(
+                    title: const Text(
+                      'FAQ',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    leading: IconButton(
+                      onPressed: () {},
+                      icon: Image.asset('assets/faq.png'),
+                    ),
+                    onTap: () {
+                      // Update the state of the app.
+                      // ...
+                    },
+                  ),
+                  ListTile(
+                    title: const Text(
+                      'Logout',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    leading: IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.logout),
+                    ),
+                    onTap: () async {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      prefs.clear();
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SelectUser(),
+                          ),
+                          (route) => false);
+                    },
+                  ),
+                  Container(
+                    margin: EdgeInsets.fromLTRB(20, 40, 00, 40),
+                    child: Image.asset(
+                      'assets/RobotekLogo.png',
+                      height: 90,
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 

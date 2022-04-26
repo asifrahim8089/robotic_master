@@ -275,6 +275,11 @@ class _HomeState extends State<Home> {
                                       preferPosition: AutoScrollPosition.middle,
                                     );
                                     cardKeys[index].currentState?.expand();
+                                    setState(() {
+                                      categoryVis = true;
+                                      colorContainer =
+                                          colorResource.primaryColor2;
+                                    });
                                   },
                                   child: Column(
                                     children: [

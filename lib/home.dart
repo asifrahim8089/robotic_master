@@ -1,15 +1,10 @@
-// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, unused_local_variable, avoid_print, deprecated_member_use, unnecessary_new, prefer_collection_literals, non_constant_identifier_names, unrelated_type_equality_checks, unnecessary_null_comparison, prefer_typing_uninitialized_variables, unused_field, unused_element
-
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
+import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:robotek/Commons/SnackBar.dart';
 import 'package:robotek/Commons/colorResource.dart';
-import 'package:robotek/Commons/zerostate.dart';
-import 'package:robotek/Components/cart_bottom_card.dart';
-import 'package:robotek/Components/home_expansioncard.dart';
 import 'package:robotek/Providers/get_data_provider.dart';
 import 'package:robotek/Shimmers/bannerdummy.dart';
 import 'package:robotek/Shimmers/checkoutdummy.dart';
@@ -20,8 +15,9 @@ import 'package:robotek/myOrdersDealer.dart';
 import 'package:robotek/selectUser.dart';
 import 'package:robotek/terms&Conditions.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'Components/product_card.dart';
 
 class Home extends StatefulWidget {
   final dealerdetails;
@@ -34,15 +30,13 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   double height = 40;
   double width = 160;
-  // ignore: prefer_final_fields
-  ItemScrollController _scrollController = ItemScrollController();
-
+  AutoScrollController scrollController = AutoScrollController();
+  List<GlobalKey<ExpansionTileCardState>> cardKeys = [];
   var data;
   var slider;
   Color colorContainer = colorResource.primaryColor2;
   bool categoryVis = true;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final List<TextEditingController> _controllers = [];
   bool circular = false;
   var scaffoldKey = GlobalKey<ScaffoldState>();
 //GetProductData
@@ -83,18 +77,6 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future scrollToItem(val) async {
-    _scrollController.scrollTo(
-      curve: Curves.slowMiddle,
-      alignment: 0.5,
-      index: val + 1,
-      duration: Duration(
-        milliseconds: 1000,
-      ),
-    );
-    print(val + 1);
-  }
-
   @override
   void initState() {
     getData(context);
@@ -132,12 +114,12 @@ class _HomeState extends State<Home> {
         ),
         automaticallyImplyLeading: false,
         actions: <Widget>[
-          new Padding(
+          Padding(
             padding: const EdgeInsets.all(10.0),
-            child: new Container(
+            child: SizedBox(
               height: 25,
               width: 25.0,
-              child: new Image.asset(
+              child: Image.asset(
                 "assets/search (1).png",
                 height: 25,
               ),
@@ -147,11 +129,13 @@ class _HomeState extends State<Home> {
       ),
       body: data == null
           ? loadingShimmer()
-          : SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
+          : CustomScrollView(
+              controller: scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Container(
                     height: 180,
+                    margin: const EdgeInsets.all(10),
                     child: ListView.builder(
                         shrinkWrap: true,
                         scrollDirection: Axis.horizontal,
@@ -162,7 +146,7 @@ class _HomeState extends State<Home> {
                               : Padding(
                                   padding: const EdgeInsets.only(left: 10),
                                   child: Container(
-                                    margin: EdgeInsets.only(right: 10),
+                                    margin: const EdgeInsets.only(right: 10),
                                     width: 280,
                                     clipBehavior: Clip.antiAlias,
                                     decoration: BoxDecoration(
@@ -170,8 +154,8 @@ class _HomeState extends State<Home> {
                                       borderRadius: BorderRadius.circular(5),
                                       // ignore: prefer_const_literals_to_create_immutables
                                       boxShadow: [
-                                        BoxShadow(
-                                            color: Color(0x48EEEEEE),
+                                        const BoxShadow(
+                                            color: const Color(0x48EEEEEE),
                                             spreadRadius: 4,
                                             blurRadius: 20)
                                       ],
@@ -186,52 +170,50 @@ class _HomeState extends State<Home> {
                                 );
                         }),
                   ),
-                  Padding(padding: EdgeInsets.only(top: 25)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      // ignore: prefer_const_literals_to_create_immutables
-                      children: [
-                        Text(
-                          "CATEGORIES",
+                ),
+                SliverToBoxAdapter(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: const [
+                      Text(
+                        "CATEGORIES",
+                        style: TextStyle(
+                            color: colorResource.primaryColorLight,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14),
+                      ),
+                      Flexible(
+                        child: Text(
+                          "DOWLOAD CATALOGUE",
                           style: TextStyle(
-                              color: colorResource.primaryColorLight,
+                              color: colorResource.primaryColor2,
                               fontWeight: FontWeight.bold,
-                              fontSize: 14),
+                              fontSize: 13),
                         ),
-                        Flexible(
-                          child: Text(
-                            "DOWLOAD CATALOGUE",
-                            style: TextStyle(
-                                color: colorResource.primaryColor2,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13),
-                          ),
-                        )
-                      ],
-                    ),
+                      )
+                    ],
                   ),
-                  ScrollablePositionedList.builder(
-                    shrinkWrap: true,
-                    physics: ScrollPhysics(),
-                    itemScrollController: _scrollController,
-                    itemCount: data.length,
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (BuildContext context, int index) {
-                      return expansionInnercard(
-                        category: data[index]["category"],
-                        products: data[index]["products"],
-                        userid: widget.dealerdetails,
-                        context: context,
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      cardKeys.add(GlobalKey());
+                      return AutoScrollTag(
+                        controller: scrollController,
+                        key: ValueKey(index),
+                        index: index,
+                        child: buildExpansionTileCard(index),
                       );
                     },
+                    childCount: data.length,
                   ),
-                  SizedBox(
-                    height: 100,
-                  )
-                ],
-              ),
+                ),
+                const SliverPadding(
+                  padding: EdgeInsets.only(
+                    bottom: 150,
+                  ),
+                ),
+              ],
             ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Padding(
@@ -247,13 +229,13 @@ class _HomeState extends State<Home> {
                   height = 100;
                   colorContainer = Colors.white;
                 });
-                await Future.delayed(Duration(milliseconds: 400));
+                await Future.delayed(const Duration(milliseconds: 400));
                 setState(() {
                   categoryVis = false;
                 });
               },
               child: AnimatedContainer(
-                duration: Duration(milliseconds: 400),
+                duration: const Duration(milliseconds: 400),
                 width: width,
                 // height: height,
                 child: categoryVis
@@ -261,8 +243,7 @@ class _HomeState extends State<Home> {
                         height: 40,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          // ignore: prefer_const_literals_to_create_immutables
-                          children: [
+                          children: const [
                             Icon(
                               Icons.menu,
                               size: 20,
@@ -275,7 +256,7 @@ class _HomeState extends State<Home> {
                         ),
                       )
                     : Container(
-                        padding: EdgeInsets.only(left: 10, top: 5),
+                        padding: const EdgeInsets.only(left: 10, top: 5),
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey, width: 1),
                             borderRadius: BorderRadius.circular(20)),
@@ -283,33 +264,31 @@ class _HomeState extends State<Home> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ListView.builder(
-                              physics: NeverScrollableScrollPhysics(),
+                              physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: data.length,
                               itemBuilder: (BuildContext context, int index) {
                                 return GestureDetector(
-                                  onTap: () => setState(() {
-                                    scrollToItem(index).then((value) {
-                                      categoryVis = true;
-                                      height = 60;
-                                      width = 160;
-                                      colorContainer =
-                                          colorResource.primaryColor2;
-                                    });
-                                  }),
+                                  onTap: () {
+                                    scrollController.scrollToIndex(
+                                      index,
+                                      preferPosition: AutoScrollPosition.middle,
+                                    );
+                                    cardKeys[index].currentState?.expand();
+                                  },
                                   child: Column(
                                     children: [
                                       Text(
                                         data[index]["category"]["name"],
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             fontWeight: FontWeight.bold),
                                       ),
                                       Container(
                                         width: width - 20,
                                         height: 1,
                                         color: Colors.black,
-                                        margin:
-                                            EdgeInsets.only(top: 4, bottom: 4),
+                                        margin: const EdgeInsets.only(
+                                            top: 4, bottom: 4),
                                       ),
                                     ],
                                   ),
@@ -332,8 +311,8 @@ class _HomeState extends State<Home> {
                                 child: Container(
                                   width: width - 20,
                                   height: 20,
-                                  child: Center(
-                                    child: Text(
+                                  child: const Center(
+                                    child: const Text(
                                       "Close",
                                       style: TextStyle(color: Colors.white),
                                     ),
@@ -354,7 +333,7 @@ class _HomeState extends State<Home> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Consumer<GetDataProvider>(
@@ -377,19 +356,19 @@ class _HomeState extends State<Home> {
                         data.cartdata != null
                             ? Text(
                                 "${data.cartdata.length.toString()}\tItems",
-                                style: TextStyle(
+                                style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold),
                               )
-                            : Text(
+                            : const Text(
                                 "0 Items",
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold),
                               ),
-                        Text(
+                        const Text(
                           "Review List",
                           style: TextStyle(
                               color: Colors.white,
@@ -412,18 +391,18 @@ class _HomeState extends State<Home> {
                 padding: EdgeInsets.zero,
                 children: [
                   Container(
-                      margin: EdgeInsets.fromLTRB(20, 40, 00, 40),
+                      margin: const EdgeInsets.fromLTRB(20, 40, 00, 40),
                       child: Row(
                         children: [
                           Image.asset(
                             'assets/businessMale.png',
                             height: 50,
                           ),
-                          Padding(padding: EdgeInsets.only(left: 20)),
+                          const Padding(padding: EdgeInsets.only(left: 20)),
                           Expanded(
                             child: Text(
                               "Hi, ${getuser.user["name"]}".toUpperCase(),
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold),
@@ -438,13 +417,13 @@ class _HomeState extends State<Home> {
                     ),
                     leading: IconButton(
                       onPressed: () {},
-                      icon: Icon(Icons.shopping_cart),
+                      icon: const Icon(Icons.shopping_cart),
                     ),
                     onTap: () {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (Context) => MyOrdersDealer()));
+                              builder: (Context) => const MyOrdersDealer()));
                     },
                   ),
                   ListTile(
@@ -457,7 +436,7 @@ class _HomeState extends State<Home> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (Context) => TermsCondition()));
+                                builder: (Context) => const TermsCondition()));
                       },
                       icon: Image.asset('assets/team.png'),
                     ),
@@ -466,7 +445,7 @@ class _HomeState extends State<Home> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (Context) => TermsCondition()));
+                              builder: (Context) => const TermsCondition()));
                     },
                   ),
                   ListTile(
@@ -483,7 +462,7 @@ class _HomeState extends State<Home> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (Context) => CustomerSupport()));
+                              builder: (Context) => const CustomerSupport()));
                     },
                   ),
                   ListTile(
@@ -496,7 +475,7 @@ class _HomeState extends State<Home> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (Context) => TermsCondition()));
+                                builder: (Context) => const TermsCondition()));
                       },
                       icon: Image.asset('assets/terms-and-conditions.png'),
                     ),
@@ -505,7 +484,7 @@ class _HomeState extends State<Home> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (Context) => TermsCondition()));
+                              builder: (Context) => const TermsCondition()));
                     },
                   ),
                   ListTile(
@@ -518,7 +497,7 @@ class _HomeState extends State<Home> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (Context) => TermsCondition()));
+                                builder: (Context) => const TermsCondition()));
                       },
                       icon: Image.asset('assets/privacy-policy (1).png'),
                     ),
@@ -527,7 +506,7 @@ class _HomeState extends State<Home> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (Context) => TermsCondition()));
+                              builder: (Context) => const TermsCondition()));
                     },
                   ),
                   ListTile(
@@ -551,7 +530,7 @@ class _HomeState extends State<Home> {
                     ),
                     leading: IconButton(
                       onPressed: () {},
-                      icon: Icon(Icons.logout),
+                      icon: const Icon(Icons.logout),
                     ),
                     onTap: () async {
                       SharedPreferences prefs =
@@ -560,13 +539,13 @@ class _HomeState extends State<Home> {
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SelectUser(),
+                            builder: (context) => const SelectUser(),
                           ),
                           (route) => false);
                     },
                   ),
                   Container(
-                    margin: EdgeInsets.fromLTRB(20, 40, 00, 40),
+                    margin: const EdgeInsets.fromLTRB(20, 40, 00, 40),
                     child: Image.asset(
                       'assets/RobotekLogo.png',
                       height: 90,
@@ -575,6 +554,66 @@ class _HomeState extends State<Home> {
                 ],
               ),
             ),
+    );
+  }
+
+  ExpansionTileCard buildExpansionTileCard(int index) {
+    return ExpansionTileCard(
+      onExpansionChanged: (value) {
+        if (value) {
+          Future.delayed(const Duration(milliseconds: 500), () {
+            for (var i = 0; i < cardKeys.length; i++) {
+              if (index != i) {
+                cardKeys[i].currentState?.collapse();
+              }
+            }
+          });
+        }
+      },
+      key: cardKeys[index],
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 15,
+            height: 18,
+            child: Image.asset(
+              "assets/fast-forward.png",
+              color: Colors.yellow,
+            ),
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          Text(
+            data[index]["category"]["name"].toUpperCase(),
+            style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                overflow: TextOverflow.ellipsis,
+                decorationColor: colorResource.primaryColor),
+          ),
+        ],
+      ),
+      trailing: SizedBox(
+        width: 30,
+        height: 25,
+        child: Image.asset("assets/download (1).png"),
+      ),
+
+      // ignore: prefer_const_literals_to_create_immutables
+      children: <Widget>[
+        ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: data[index]["products"].length,
+            itemBuilder: (BuildContext context, int indexproducts) {
+              return Product(
+                data[index]["products"][indexproducts],
+                widget.dealerdetails,
+              );
+            })
+      ],
     );
   }
 

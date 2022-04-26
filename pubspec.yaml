@@ -55,6 +55,7 @@ dependencies:
   open_file: ^3.2.1
   universal_html: ^2.0.8
   scroll_to_index: ^2.1.1
+  expansion_tile_card: ^2.0.0
 
 dev_dependencies:
   flutter_test:

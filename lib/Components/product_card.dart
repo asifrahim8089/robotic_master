@@ -8,9 +8,9 @@ class Product extends StatelessWidget {
   final data;
   final dealerdetails;
   Product(this.data, this.dealerdetails, {Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
+    final getCart = Provider.of<GetDataProvider>(context, listen: false);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListTile(
@@ -53,7 +53,9 @@ class Product extends StatelessWidget {
               ),
               child: Center(
                 child: TextFormField(
-                  // controller: _controller,
+                  initialValue:
+                      Provider.of<GetDataProvider>(context, listen: false)
+                          .fetchCartQty(context, dealerdetails, data["id"]),
                   keyboardType: TextInputType.number,
                   style: const TextStyle(fontSize: 14, color: Colors.white),
                   decoration: const InputDecoration(

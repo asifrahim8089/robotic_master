@@ -99,6 +99,19 @@ class GetDataProvider extends ChangeNotifier {
   }
 
   //FetchCart details
+  String fetchCartQty(context, dealerDetails, productId) {
+    // fetchCart(context, dealerDetails);
+    try {
+      for (var item in cartdata) {
+        if (item["product_id"] == productId) {
+          return item["qty"];
+        }
+      }
+    } catch (e) {
+      return "";
+    }
+    return "";
+  }
 
   void fetchCart(context, dealerdetails) async {
     print("fetch cart");

@@ -202,7 +202,7 @@ class _HomeState extends State<Home> {
                         controller: scrollController,
                         key: ValueKey(index),
                         index: index,
-                        child: buildExpansionTileCard(index),
+                        child: buildExpansionTileCard(index, context),
                       );
                     },
                     childCount: data.length,
@@ -562,7 +562,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  ExpansionTileCard buildExpansionTileCard(int index) {
+  ExpansionTileCard buildExpansionTileCard(int index, BuildContext context) {
     return ExpansionTileCard(
       onExpansionChanged: (value) {
         if (value) {
